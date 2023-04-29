@@ -15,8 +15,10 @@ import {
   Image,
   Linking
 } from 'react-native';
+import { SearchBar } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const cuisines = ['American', 'Asian', 'British', 'Caribbean', 'Chinese', 'French', 'Greek', 'Indian', 'Italian', 'Japanese', 'Mediterranean', 'Mexican', 'Moroccan', 'Spanish', 'Thai', 'Turkish', 'Vietnamese'];
+const cuisines = ['American', 'Asian', 'British', 'Caribbean', 'Central Europe', 'Chinese', 'Eastern Europe', 'French', 'Greek', 'Indian', 'Italian', 'Japanese', 'Korean', 'Kosher', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Nordic', 'South American', 'South East Asian', 'World'];
 
 const CuisineCard = ({ cuisine, navigation }) => {
   const handlePress = () => {
@@ -57,14 +59,16 @@ const HomeScreen = ({ navigation }) => {
 const DetailsScreen = ({ route }) => {
   const { cuisine } = route.params;
   const [data, setData] = useState([]);
+  const [searchText, setSearchText] = useState('');
 
 
   useEffect(() => {
     fetchData();
   }, []);
-
+  const cuisineN = cuisine.replace(/ /g, '%20').toLowerCase();
+ 
   const fetchData = async () => {
-    const response = await fetch(`https://api.edamam.com/search?q=${cuisine}&app_id=${"acdacb8d"}&app_key=${'02befa5bfeaaefbd07d90c1561317e9c'}&from=0&to=50`);
+    const response = await fetch(`https://api.edamam.com/api/recipes/v2?type=public&app_id=acdacb8d&app_key=02befa5bfeaaefbd07d90c1561317e9c&cuisineType=${cuisineN}&from=0&to=50&q=${searchText}`);
     const json = await response.json();
     setData(json.hits);
   };
@@ -83,8 +87,42 @@ const DetailsScreen = ({ route }) => {
     );
   };
 
+  const handleSearch = (text) => {
+    setSearchText(text);
+  };
+
+  const clearSearch = () => {
+    setSearchText('');
+  };
+
   return (
     <View style={styles.container}>
+      <SearchBar
+        placeholder="Search dishes"
+        onChangeText={handleSearch}
+        value={searchText}
+        onClear={clearSearch}
+        onSubmitEditing={fetchData}
+        containerStyle={styles.searchBarContainer}
+        inputContainerStyle={styles.searchBarInputContainer}
+        inputStyle={styles.searchBarInput}
+        searchIcon={(
+        <Icon
+          name="search"
+          size={20}
+          color="gray"
+          onPress={fetchData}
+          />
+        )}
+        clearIcon={(
+    <Icon
+      name="remove"
+      size={20}
+      color="gray"
+      onPress={clearSearch}
+    />
+  )}
+      />
       <FlatList
         data={data}
         keyExtractor={(item, index) => index.toString()}
@@ -102,7 +140,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Cuisine Types' }} />
-        <Stack.Screen name="Details" component={DetailsScreen} options={{ title: 'Details' }} />
+        <Stack.Screen name="Details" component={DetailsScreen} options={({ route }) => ({ title: `Dishes - ${route.params.cuisine}` })}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -136,6 +174,21 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginTop: 100,
+  },
+  searchBarContainer: {
+    backgroundColor: '#fff',
+    borderTopColor: '#fff',
+    borderBottomColor: '#fff',
+    padding: 0,
+  },
+  searchBarInputContainer: {
+    backgroundColor: '#f2f2f2',
+  },
+  searchBarInput: {
+    fontSize: 16,
+  },
+  searchBarClearIcon: {
+    color: '#86939e',
   },
   flatList: {
     paddingVertical: 16,
