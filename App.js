@@ -98,31 +98,16 @@ const DetailsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <SearchBar
-        placeholder="Search dishes"
-        onChangeText={handleSearch}
-        value={searchText}
-        onClear={clearSearch}
-        onSubmitEditing={fetchData}
-        containerStyle={styles.searchBarContainer}
-        inputContainerStyle={styles.searchBarInputContainer}
-        inputStyle={styles.searchBarInput}
-        searchIcon={(
-        <Icon
-          name="search"
-          size={20}
-          color="gray"
-          onPress={fetchData}
-          />
-        )}
-        clearIcon={(
-    <Icon
-      name="remove"
-      size={20}
-      color="gray"
-      onPress={clearSearch}
-    />
-  )}
-      />
+  placeholder="Search dishes"
+  onChangeText={handleSearch}
+  value={searchText}
+  onClear={clearSearch}
+  onSubmitEditing={fetchData}
+  containerStyle={styles.searchBarContainer}
+  inputContainerStyle={styles.searchBarInputContainer}
+  inputStyle={styles.searchBarInput}
+/>
+
       <FlatList
         data={data}
         keyExtractor={(item, index) => index.toString()}
